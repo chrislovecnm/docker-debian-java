@@ -1,4 +1,16 @@
 sudo: required
-
 services:
-  - docker
+- docker
+language: bash
+script:
+- make
+after_success:
+- |
+  [ -z "$DOCKER_HUB_USER" ] && echo "Need to set DOCKER_HUB_USER" && exit 1;
+  [ -z "$DOCKER_HUB_PASS" ] && echo "Need to set DOCKER_HUB_PASS" && exit 1;
+- docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
+- make push-docker-hub
+env:
+  global:
+  - secure: RlopaY76w21BNz7LYHgyblW6WzK5FnikR2sUcx8eQIYwnlTJz+jrLJ1ynp0rNYqVbltELiGSkKSp4HhbAHTg3/aSIVWvRywY8hw+QLpYIuhniSbpksE1WrR5wy/n6z6qQXTff6Lkv3qm6aVP6gpLtIrwotyqv81n+cDky3r8AykeCiyLyToefo7QnF4OwX/vytKOBHKAGFVqkjdacOrf8TPC7VxwY0aMkx934h2CCZ4+zz2jGeIem+dT+51HAsx+Aq77zfJCxbYXLyVbL5+2yrikp4N+6vryhIJyb5SL2wvSqHfZJyT50uyweYEdxVOLipFQZYZAHskze5xoHiUrcFXjZeWnSUFmhw6fnWKtTd5OWgOu1sc8WiVLxXovdB8fZl90p8i/qb5TiSRWNw5ge5qTjmy9md8ai0p+w+rLF9+rzSkZM43jp2gmqbBt1lxepfoBM9hZnEGSZXEJ8EFowm6kJyp70TKgvtNyiMOwxzsYJpPBRD/KoullYBPINUnIkKi46r/aNldlHU6bXtX1iFfMYkPAzZPZuO2TIUqzReb3IMRD9DwsboCFoYZQhwl2r4JORX3RLIUI21yy0X1+D4DWcz4zmXg4moroXErZ3lsCfCDMwkrGxZls3TMPvGFRmvpDIFu75UPOxC1MeVceSgorHz7Afy7ntilR1glFn48=
+  - secure: J75BY+RJ4YgDjikhSHT4LBWs453bRQvTmGHgZnYZWHpyKhdR6EiUkAn0WBxiv9aTRf/1k8LKSwUlX0xj47a7wCQgnQIl0fuJ0YgH0xBEntJ6IUv7KalY9XrKtItsV43xkpgjUaHOHAhQhVqAS96hitIxKer5vd2s/jUMcmAKbQP6laLL8BB8DfQvcxmjrDTQ60zAM5SqkK3CeoOAUCcCb0x3zCF1KV1H170GwHxq2PW4yrOYJJiYutvRn77QXaHTiTjykYFvsw4t5Wv2VyADJbue3mKgMLvgCzoUQpn9OXL+wG15w7mhlFjIRlAnOJjNCvgJBH8cWmqw4suIfZep0fHiB6xr3PFOvSkKnWTqXl197n/juerI3T75SlL+zsOFhik6/uaM/93givP64b102clnwy2GuhR24O22URCwBORcY/JwV7pFNOvsvlKbr0SwoK7c9yafGS8g4MspbqRHTn08gFC4uQXhlcBWSOxmmiSGqr9xRQY2QIXGoazXLhDZm9YELCIH68O5cYjmWqdbIOu8GF33Vb8C84/QsfSpN0MDCEOqhuQc9E+lHxpQh54NkFHbDfWNXxzQXyTCHNuwa4L1AZL28tOoIddIoH6spao/t5nKncuAh9PqBswTEQdxtiuj7DKdu4S5ReH9lGe78IvVU/LnVFknkvChOgvm6DU=
