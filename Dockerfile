@@ -1,4 +1,4 @@
-FROM gcr.io/google_containers/ubuntu-slim:0.6
+FROM gcr.io/google_containers/ubuntu-slim:0.14
 
 ARG BUILD_DATE
 ARG VCS_REF
@@ -7,11 +7,11 @@ ARG JAVA_VERSION
 LABEL \
     org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.docker.dockerfile="/Dockerfile" \
-    org.label-schema.name="Debian container with Java" \
-    org.label-schema.url="https://github.com/vorstella/debian-java" \
+    org.label-schema.name="Ubuntu Slim container with Java" \
+    org.label-schema.url=$VCS \
     org.label-schema.vcs-ref=$VCS_REF \
     org.label-schema.vcs-type="Git" \
-    org.label-schema.vcs-url="https://github.com/vorstella/debian-java"
+    org.label-schema.vcs-url=$VCS
 
 ENV \
     JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
@@ -20,7 +20,7 @@ RUN \
     set -ex \
     && echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections \
     && apt-get update && apt-get -qq -y --force-yes install --no-install-recommends \
-    openjdk-8-jre-headless \
+    openjdk-8-jre-headless=$JAVA_VERSION \
     libjemalloc1 \
     localepurge \
     wget \
