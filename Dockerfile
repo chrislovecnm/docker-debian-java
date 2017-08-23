@@ -1,8 +1,6 @@
-FROM gcr.io/google_containers/ubuntu-slim:0.6
+FROM debian:stretch-slim
 
-ARG BUILD_DATE
 ARG VCS_REF
-ARG JAVA_VERSION
 
 LABEL \
     org.label-schema.build-date=$BUILD_DATE \
@@ -14,17 +12,34 @@ LABEL \
     org.label-schema.vcs-url="https://github.com/vorstella/debian-java"
 
 ENV \
-    JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+    JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 \
+    JAVA_VERSION=8u141 \
+    JAVA_DEBIAN_VERSION=8u141-b15-1~deb9u1 \
+    CA_CERTIFICATES_JAVA_VERSION=20170531+nmu
 
 RUN \
     set -ex \
     && echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections \
-    && apt-get update && apt-get -qq -y --force-yes install --no-install-recommends \
-    openjdk-8-jre-headless \
-    libjemalloc1 \
-    localepurge \
-    wget \
-    jq \
+    && if [ ! -d /usr/share/man/man1 ]; then mkdir -p /usr/share/man/man1; fi \
+    && apt-get update \
+    && apt-get -qq -y --allow --no-install-recommends \
+      localepurge \
+    && apt-get -qq -y --allow --no-install-recommends \
+      openjdk-8-jre-headless="$JAVA_DEBIAN_VERSION" \
+      ca-certificates-java \
+      libjemalloc1 \
+    && /var/lib/dpkg/info/ca-certificates-java.postinst configure \
+    && apt -y autoremove \
+    && apt-get -y purge \
+      localepurge \
+      passwd \
+      tar \
+      gzip \
+      diffutils \
+      findutils \
+      fonts-dejavu-core \
+      grep \
+      sed \
     && apt-get clean \
     && rm -rf \
         ~/.bashrc \
@@ -67,5 +82,3 @@ RUN \
         /usr/lib/jvm/java-8-openjdk-amd64/man \
         /usr/lib/jvm/java-8-openjdk-amd64/jre/THIRD_PARTY_README \
         /usr/lib/jvm/java-8-openjdk-amd64/jre/ASSEMBLY_EXCEPTION
-
-CMD ["/bin/sh"]
