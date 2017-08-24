@@ -5,7 +5,7 @@ PROJECT_ID?=java
 PROJECT_VERSION?=8u131-b11
 JAVA_VERSION?=${PROJECT_VERSION}-2ubuntu1.16.04.3
 
-# TODO the next section is boilerplate and couple be pulled in somehow 
+# TODO the next section is boilerplate and couple be pulled in somehow
 # set if you change the group
 GROUP_ID?=vorstella
 
@@ -17,38 +17,37 @@ GIT_VERSION=$(shell git describe --always)
 
 # Setup Build Versions
 ifdef ${TRAVIS}
-  $(info travis build)
+$(info travis build)
 
-  GIT_VERSION=${TRAVIS_COMMIT::9}
+GIT_VERSION=${TRAVIS_COMMIT::9}
 
-  # tag release build
-  ifdef ${TRAVIS_TAG}
-    DOCKER_HUB_BUILD=${DOCKER_BASE}-release-${TRAVIS_TAG}.${TRAVIS_BUILD_NUMBER}
-    $(info travis release: [${DOCKER_HUB_BUILD}])
-  endif
-  
-  # pull request
-  ifeq (${TRAVIS_EVENT_TYPE},pull_request)
-	DOCKER_HUB_BUILD=${DOCKER_BASE}-beta-${TRAVIS_PULL_REQUEST_SHA::9}.${TRAVIS_BUILD_NUMBER}
-	$(info travis pull request: [${DOCKER_HUB_BUILD}])
-  endif
-  
-  # pull request
-  ifeq (${TRAVIS_EVENT_TYPE},cron)
-    DOCKER_HUB_BUILD=${DOCKER_BASE}-alpha-${GIT_VERSION}.${TRAVIS_BUILD_NUMBER}
-    $(info travis cron: [${DOCKER_HUB_BUILD}])
-  endif
-
-  QUAY_BUILD=quay.io/${DOCKER_HUB_BUILD}
-  TAGS=${TAGS} -t ${QUAY_BUILD} -t ${DOCKER_HUB_BUILD}
-
-else
-  $(info local build)
-  DOCKER_HUB_BUILD=${DOCKER_BASE}-alpha-${GIT_VERSION}
-  TAGS=-t ${DOCKER_HUB_BUILD}
+# tag release build
+ifdef ${TRAVIS_TAG}
+DOCKER_HUB_BUILD=${DOCKER_BASE}-release-${TRAVIS_TAG}.${TRAVIS_BUILD_NUMBER}
+$(info travis release: [${DOCKER_HUB_BUILD}])
 endif
 
-all: build 
+# pull request
+ifeq (${TRAVIS_EVENT_TYPE},pull_request)
+DOCKER_HUB_BUILD=${DOCKER_BASE}-beta-${TRAVIS_PULL_REQUEST_SHA::9}.${TRAVIS_BUILD_NUMBER}
+$(info travis pull request: [${DOCKER_HUB_BUILD}])
+endif
+
+# pull request
+ifeq (${TRAVIS_EVENT_TYPE},cron)
+DOCKER_HUB_BUILD=${DOCKER_BASE}-alpha-${GIT_VERSION}.${TRAVIS_BUILD_NUMBER}
+$(info travis cron: [${DOCKER_HUB_BUILD}])
+endif
+
+QUAY_BUILD=quay.io/${DOCKER_HUB_BUILD}
+TAGS=${TAGS} -t ${QUAY_BUILD} -t ${DOCKER_HUB_BUILD}
+else
+$(info local build)
+DOCKER_HUB_BUILD=${DOCKER_BASE}-alpha-${GIT_VERSION}
+TAGS=-t ${DOCKER_HUB_BUILD}
+endif
+
+all: build
 	$(info $$TRAVIS is [${TRAVIS}])
 	$(info $$TRAVIS_TAG is [${TRAVIS_TAG}])
 	$(info $$TRAVIS_EVENT_TYPE is [${TRAVIS_EVENT_TYPE}])
@@ -57,18 +56,18 @@ all: build
 
 docker:
 	docker build --compress \
-		--build-arg "JAVA_VERSION=${JAVA_VERSION}" \
-		--build-arg="BUILD_DATE=${BUILD_DATE} \
-		--build-arg="VCS_REF=${GIT_VERSION} \
-	       	${TAGS} .
+	--build-arg "JAVA_VERSION=${JAVA_VERSION}" \
+	--build-arg="BUILD_DATE=${BUILD_DATE} \
+	--build-arg="VCS_REF=${GIT_VERSION} \
+	${TAGS} .
 
 build: docker
 
 # FIXME if this fails the build is still marked as successful
-push-docker-hub: 
+push-docker-hub:
 	docker push ${DOCKER_HUB_BUILD}
 
-push-quay: 
+push-quay:
 	docker push ${QUAY_BUILD}
 
 push: push-docker-hub
