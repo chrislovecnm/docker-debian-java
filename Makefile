@@ -17,12 +17,12 @@ GIT_VERSION=$(shell git describe --always)
 
 # Setup Build Versions
 ifdef TRAVIS
+  $(info travis build)
   $(info $$TRAVIS is [${TRAVIS}])
   $(info $$TRAVIS_TAG is [${TRAVIS_TAG}])
   $(info $$TRAVIS_EVENT_TYPE is [${TRAVIS_EVENT_TYPE}])
   $(info $$TRAVIS_BUILD_NUMBER is [${TRAVIS_BUILD_NUMBER}])
   $(info $$TRAVIS_PULL_REQUEST_SHA is [${TRAVIS_PULL_REQUEST_SHA::9}])
-  $(info travis build)
 
   GIT_VERSION?=${TRAVIS_COMMIT::9}
 
@@ -34,7 +34,7 @@ ifdef TRAVIS
 
   # pull request
   ifeq (${TRAVIS_EVENT_TYPE},pull_request)
-    DOCKER_HUB_BUILD=${DOCKER_BASE}-beta-${TRAVIS_PULL_REQUEST_SHA::9}.${TRAVIS_BUILD_NUMBER}
+    DOCKER_HUB_BUILD=${DOCKER_BASE}-beta-${GIT_VERSION}.${TRAVIS_BUILD_NUMBER}
     $(info travis pull request: [${DOCKER_HUB_BUILD}])
   else
     DOCKER_HUB_BUILD=${DOCKER_BASE}-alpha-${GIT_VERSION}.${TRAVIS_BUILD_NUMBER}
