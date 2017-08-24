@@ -5,9 +5,6 @@ language: bash
 script:
 - make
 after_success:
-- |
-  [ -z "$DOCKER_HUB_USER" ] && echo "Need to set DOCKER_HUB_USER" && exit 1;
-  [ -z "$DOCKER_HUB_PASS" ] && echo "Need to set DOCKER_HUB_PASS" && exit 1;
 - docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
 - make push-docker-hub
 env:
