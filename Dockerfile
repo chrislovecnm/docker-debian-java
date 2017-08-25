@@ -1,31 +1,39 @@
 FROM gcr.io/google_containers/ubuntu-slim:0.14
 
 ARG BUILD_DATE
-ARG VCS_REF
 ARG JAVA_VERSION
-
-LABEL \
-    org.label-schema.build-date=$BUILD_DATE \
-    org.label-schema.docker.dockerfile="/Dockerfile" \
-    org.label-schema.name="Ubuntu Slim container with Java" \
-    org.label-schema.url=$VCS \
-    org.label-schema.vcs-ref=$VCS_REF \
-    org.label-schema.vcs-type="Git" \
-    org.label-schema.vcs-url=$VCS
+ARG VCS_REF
 
 ENV \
-    JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+    JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 \
+    URL=https://github.com/vorstella/docker-java \
+    DI_VERSION=1.2.0 \
+    DI_SHA=81231da1cd074fdc81af62789fead8641ef3f24b6b07366a1c34e5b059faf363
+ 
+LABEL \
+    org.label-schema.docker.dockerfile="/Dockerfile" \
+    org.label-schema.license="Apache License 2.0" \
+    org.label-schema.name="Ubuntu Slim container with Java" \
+    org.label-schema.vcs-type="Git" \
+    org.label-schema.build-date=$BUILD_DATE \
+    org.label-schema.vcs-ref=$VCS_REF \
+    org.label-schema.url=$URL \
+    org.label-schema.vcs-url=$URL
 
 RUN \
     set -ex \
     && echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections \
-    && apt-get update && apt-get -qq -y --force-yes install --no-install-recommends \
-    openjdk-8-jre-headless=$JAVA_VERSION \
-    libjemalloc1 \
-    localepurge \
-    wget \
-    jq \
+    && apt-get update \
+    && apt-get -qq -y --force-yes install --no-install-recommends \
+      openjdk-8-jre-headless=$JAVA_VERSION \
+      libjemalloc1 \
+      localepurge \
+      wget \
+    && wget -q -O - https://github.com/Yelp/dumb-init/releases/download/v${DI_VERSION}/dumb-init_${DI_VERSION}_amd64 > /sbin/dumb-init \
+    && echo "$DI_SHA  /sbin/dumb-init" | sha256sum -c - \
+    && chmod +x /sbin/dumb-init \
     && apt-get clean \
+    && apt-get -y purge localepurge wget \
     && rm -rf \
         ~/.bashrc \
         /etc/systemd \
