@@ -8,5 +8,8 @@ language: go
 script:
 - make
 after_success: 
-- evn
+- env
+- alias
+- echo $SHELL
 - echo $DOCKER_HUB_USER
+- echo DONE
