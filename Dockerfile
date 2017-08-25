@@ -6,7 +6,6 @@ ARG VCS_REF
 
 ENV \
     JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64 \
-    URL=https://github.com/vorstella/docker-java \
     DI_VERSION=1.2.0 \
     DI_SHA=81231da1cd074fdc81af62789fead8641ef3f24b6b07366a1c34e5b059faf363
  
@@ -17,8 +16,8 @@ LABEL \
     org.label-schema.vcs-type="Git" \
     org.label-schema.build-date=$BUILD_DATE \
     org.label-schema.vcs-ref=$VCS_REF \
-    org.label-schema.url=$URL \
-    org.label-schema.vcs-url=$URL
+    org.label-schema.url=https://github.com/vorstella/docker-java \
+    org.label-schema.vcs-url=https://github.com/vorstella/docker-java 
 
 RUN \
     set -ex \
