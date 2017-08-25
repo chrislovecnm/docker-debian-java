@@ -17,36 +17,19 @@ GIT_VERSION=$(shell git describe --always)
 
 # Setup Build Versions
 ifdef TRAVIS
-  $(info travis build)
-  $(info $$TRAVIS is [${TRAVIS}])
-  $(info $$TRAVIS_TAG is [${TRAVIS_TAG}])
-  $(info $$TRAVIS_EVENT_TYPE is [${TRAVIS_EVENT_TYPE}])
-  $(info $$TRAVIS_BUILD_NUMBER is [${TRAVIS_BUILD_NUMBER}])
-  $(info $$TRAVIS_PULL_REQUEST_SHA is [${TRAVIS_PULL_REQUEST_SHA::9}])
-
-  GIT_VERSION?=${TRAVIS_COMMIT::9}
-
   # tag release build
   ifdef TRAVIS_TAG
-    DOCKER_HUB_BUILD=${DOCKER_BASE}-release-${TRAVIS_TAG}.${TRAVIS_BUILD_NUMBER}
-    $(info travis release: [${DOCKER_HUB_BUILD}])
-  endif
-
-  # pull request
-  ifeq (${TRAVIS_EVENT_TYPE},pull_request)
-    DOCKER_HUB_BUILD=${DOCKER_BASE}-beta-${GIT_VERSION}.${TRAVIS_BUILD_NUMBER}
-    $(info travis pull request: [${DOCKER_HUB_BUILD}])
+    DOCKER_HUB_BUILD=${DOCKER_BASE}-${TRAVIS_TAG}-${TRAVIS_BUILD_NUMBER}
   else
-    DOCKER_HUB_BUILD=${DOCKER_BASE}-alpha-${GIT_VERSION}.${TRAVIS_BUILD_NUMBER}
-    $(info travis cron: [${DOCKER_HUB_BUILD}])
+    DOCKER_HUB_BUILD=${DOCKER_BASE}-alpha-${TRAVIS_COMMIT::9}-${TRAVIS_BUILD_NUMBER}
   endif
 
   QUAY_BUILD:=quay.io/${DOCKER_HUB_BUILD}
   TAGS=-t ${QUAY_BUILD} -t ${DOCKER_HUB_BUILD}
 else
-  $(info local build)
-  DOCKER_HUB_BUILD=${DOCKER_BASE}-alpha-${GIT_VERSION}
+  DOCKER_HUB_BUILD=${DOCKER_BASE}-dev-${GIT_VERSION}
   TAGS=-t ${DOCKER_HUB_BUILD}
+  $(info docker build tag: [${DOCKER_HUB_BUILD}])
 endif
 
 all: build
