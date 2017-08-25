@@ -9,5 +9,12 @@ language: bash
 script:
 - make
 after_success:
-- docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
-- make push-docker-hub
+- |
+  if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then
+    echo "Pushing containers"
+    docker login -u $DOCKER_HUB_USER -p $DOCKER_HUB_PASS
+    make push-docker-hub
+    # TODO add quay.io
+  else
+    echo "Not pushing container to registry because this is a PR"
+  fi
